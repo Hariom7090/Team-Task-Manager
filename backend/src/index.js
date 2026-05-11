@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { PrismaClient } from '@prisma/client';
+import  PrismaClient  from '@prisma/client';
 
 import authRoutes from './routes/authRoutes.js';
 import projectRoutes from './routes/projectRoutes.js';
@@ -19,6 +19,7 @@ export const prisma = new PrismaClient();
 
 const app = express();
 
+// 🚨 FIX 1: CORS (keep it simple & safe)
 app.use(cors({
   origin: [
     'http://localhost:5173',
@@ -27,6 +28,10 @@ app.use(cors({
   ],
   credentials: true
 }));
+
+// 🚨 FIX 2: BODY PARSING (MOST IMPORTANT)
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // API Routes
 app.use('/api/auth', authRoutes);
