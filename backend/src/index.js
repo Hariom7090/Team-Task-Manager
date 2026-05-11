@@ -2,37 +2,50 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
+
 import authRoutes from './routes/authRoutes.js';
 import projectRoutes from './routes/projectRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import userRoutes from './routes/userRoutes.js';
-import  errorMiddleware  from './middleware/errorMiddleware.js';
+import errorMiddleware from './middleware/errorMiddleware.js';
 
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
 
 export const prisma = new PrismaClient();
+
 const app = express();
 
 app.use(cors({
   origin: ['http://localhost:5173', 'http://localhost:3000'],
   credentials: true
 }));
+
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("Backend Working Successfully 🚀");
-});
-
-// Routes
+// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/dashboard', dashboardRoutes);
-app.use("/api/users", userRoutes);
+app.use('/api/users', userRoutes);
 
-// Error handling
+// __dirname fix
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve frontend
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+// React fallback
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
+
+// Error handler
 app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 5000;
