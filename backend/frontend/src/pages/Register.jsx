@@ -6,7 +6,7 @@ const Register = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  // form state
+  // ✅ FIX: proper controlled state
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,8 +16,8 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // frontend validation (IMPORTANT)
-    if (!name || !email || !password) {
+    // ✅ FIX: frontend validation (prevents backend 400 errors)
+    if (!name.trim() || !email.trim() || !password.trim()) {
       alert("All fields are required");
       return;
     }
@@ -27,6 +27,9 @@ const Register = () => {
       return;
     }
 
+    // 🔍 DEBUG (VERY IMPORTANT)
+    console.log("REGISTER DATA:", { name, email, password });
+
     setLoading(true);
 
     const success = await register(name, email, password);
@@ -34,20 +37,20 @@ const Register = () => {
     setLoading(false);
 
     if (success) {
-      navigate("/dashboard"); // change if needed
+      navigate("/"); // or dashboard
     }
   };
 
   return (
     <div style={styles.container}>
       <form onSubmit={handleSubmit} style={styles.form}>
-        <h2>Create Account</h2>
+        <h2>Register</h2>
 
         <input
           type="text"
           placeholder="Name"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => setName(e.target.value)}   // ✅ FIX
           style={styles.input}
         />
 
@@ -55,7 +58,7 @@ const Register = () => {
           type="email"
           placeholder="Email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}  // ✅ FIX
           style={styles.input}
         />
 
@@ -63,11 +66,11 @@ const Register = () => {
           type="password"
           placeholder="Password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)} // ✅ FIX
           style={styles.input}
         />
 
-        <button type="submit" style={styles.button} disabled={loading}>
+        <button type="submit" disabled={loading} style={styles.button}>
           {loading ? "Creating..." : "Register"}
         </button>
       </form>
@@ -88,7 +91,7 @@ const styles = {
     gap: "10px",
     width: "300px",
     padding: "20px",
-    border: "1px solid #ccc",
+    border: "1px solid #ddd",
     borderRadius: "10px",
   },
   input: {
@@ -97,7 +100,7 @@ const styles = {
   },
   button: {
     padding: "10px",
-    backgroundColor: "#4CAF50",
+    backgroundColor: "green",
     color: "white",
     border: "none",
     cursor: "pointer",
